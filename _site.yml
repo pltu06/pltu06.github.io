@@ -1,4 +1,6 @@
 name: "my-website"
+output_dir: "."
+exclude: ["README.md"]
 navbar:
   title: "My Website"
   left:
