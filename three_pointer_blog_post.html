@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Patrick Tu" />
+
+
+<title>Three Pointer Analysis</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Three Pointer Analysis</h1>
+<h4 class="author">Patrick Tu</h4>
+<h4 class="date">2/6/2022</h4>
+
+</div>
+
+
+<p>It seems over the past several years that three point shooting has been skyrocketing in the NBA. We wanted to see if this increase in three point shooting was true, and quantify this increase across 21 years, from 2000-2021.</p>
+<p>First we prepped out data space:</p>
+<pre class="r"><code>source(&quot;R-Prep.R&quot;)</code></pre>
+<p>Here is how we simplified and prepared the data:</p>
+<pre class="r"><code>source(&quot;DataAnalysisNBA.R&quot;)
+#put hyperlink</code></pre>
+<p>If you want to see the above script, go <a href="https://github.com/pltu06/NBA-R/blob/main/DataAnalysisNBA.R">here</a>.</p>
+<p>This is how we extracted the data:</p>
+<pre class="r"><code>games_3ptsa_sum &lt;- 
+  rs_game_logs %&gt;% 
+  select(idGame, fg3aTeam, yearSeason) %&gt;%
+  group_by(idGame, yearSeason) %&gt;%
+  summarise(fg3a_sum = sum(fg3aTeam)) %&gt;%
+  ungroup()</code></pre>
+<p>Then we calculated the mean three pointers and visualized them over the last twenty-one years:</p>
+<pre class="r"><code>mean_3ptsa_season &lt;- games_3ptsa_sum %&gt;%
+  group_by(yearSeason)%&gt;%
+  summarise(mean_3ptsa_sum = mean(fg3a_sum))%&gt;%
+  ungroup()
+
+ggplot(data = mean_3ptsa_season, aes(x = yearSeason, y = mean_3ptsa_sum))+
+  geom_point(data = games_3ptsa_sum, 
+             aes(x = yearSeason, y = fg3a_sum), 
+             position = position_jitter(.22))+
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;white&quot;, alpha = 1/3, color = &quot;green&quot;)+
+  geom_smooth(method = &quot;lm&quot;, color = &quot;red&quot;)+
+  labs(x = &quot;Season&quot;, y = &quot;3 Pointers Attempted During Game&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>The plot revealed that there was a clear increase in three pointers made over the last twenty years in the NBA and we decided to perform a deeper analysis on the data.</p>
+<p>We extracted the data using:</p>
+<pre class="r"><code>orebfg3_data &lt;- 
+  rs_game_logs %&gt;%
+  select(
+    season = yearSeason, 
+    team = nameTeam, 
+    teamid = idTeam, 
+    idGame, fg3mTeam, 
+    orebTeam
+    )
+
+# A solution for having each teamid match up with one team name:
+team_names &lt;- 
+  orebfg3_data %&gt;%
+  select(team, teamid) %&gt;%
+  distinct() %&gt;%
+  arrange(teamid) 
+
+# These are the teams with repeat names
+repeats &lt;- 
+  team_names %&gt;%
+  count(teamid) %&gt;%
+  filter(n&gt;1)
+
+# our chosen names (what they are named today)
+new_names &lt;- 
+  repeats %&gt;% 
+  left_join(., team_names, by = &quot;teamid&quot;) %&gt;%
+  mutate(
+    name = case_when(
+      teamid ==  1610612740 ~ &quot;New Orleans Pelicans&quot;,
+      teamid == 1610612746 ~ &quot;Los Angeles Clippers&quot; ,
+      teamid == 1610612751 ~ &quot;Brooklyn Nets&quot; ,
+      teamid == 1610612760 ~ &quot;Oklahoma City Thunder&quot; ,
+      teamid == 1610612763 ~ &quot;Memphis Grizzlies&quot; ,
+      teamid == 1610612766 ~ &quot;Charlotte Hornets&quot;
+    )
+  )
+
+# Gathering data for the new names
+replace_teams &lt;- 
+  new_names %&gt;% 
+  select(-team, -n) %&gt;% 
+  distinct() %&gt;%
+  rename(team = name) %&gt;%
+  left_join(., orebfg3_data, by =&quot;teamid&quot;) %&gt;%
+  rename(team = team.x) %&gt;%
+  select(-team.y)
+
+# appended the new data
+orebfg3_data_newnames &lt;- 
+  orebfg3_data %&gt;% 
+  filter(teamid %nin% replace_teams$teamid) %&gt;%
+  bind_rows(., replace_teams)</code></pre>
+<p>Now that we had all the right teams we graphed them here:</p>
+<pre class="r"><code>pj &lt;- position_jitter(width = .2)
+ggplot(orebfg3_data_newnames, aes(season, fg3mTeam)) +
+  geom_point(position = pj, alpha = 1/3, shape = 1) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;red&quot;) +
+  labs(x = &quot;Season&quot;, &quot;Three-Pointers Made&quot;) +
+  theme_classic() +
+  facet_wrap(~team)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Next we decided to perform multi-level modeling and we collected all thirty of the linear models into a data set:</p>
+<pre class="r"><code>fg3_data_mod &lt;- 
+  orebfg3_data_newnames %&gt;%
+  nest_by(team) %&gt;%
+  mutate(mod = list(lm(fg3mTeam ~ 1 + scale(season, scale = FALSE), data = data)))
+
+level1omni &lt;-
+  fg3_data_mod %&gt;%
+  summarise(broom::tidy(mod, conf.int = TRUE, conf.level = 0.95)) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    sig = p.value &lt; 0.05,
+    term = case_when(
+      term == &quot;(Intercept)&quot; ~ &quot;Intercept&quot;,
+      term == &quot;scale(season, scale = FALSE)&quot; ~ &quot;season&quot;
+    )
+    )</code></pre>
+<p>We graphed the slopes and intercepts to see if they were significant here:</p>
+<pre class="r"><code>ggplot(
+  level1omni %&gt;% filter(term == &quot;Intercept&quot;), 
+  aes(estimate, reorder(team, estimate), color = sig)
+  ) +
+  geom_point(size = 2) +
+  coord_cartesian(xlim = c(5, 10)) +
+  geom_errorbarh(
+    aes(xmin=conf.low, xmax=conf.high), 
+    height=.2
+  )+
+  labs(title = &quot;Intercepts&quot;, x = &quot;Estimate&quot;, y = &quot;Team&quot;, caption = &quot;95% CI error bars \n all estimates were significant (p&lt;.05)&quot;)+
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(
+  level1omni %&gt;% filter(term == &quot;season&quot;), 
+  aes(estimate, reorder(team, estimate), color = sig)
+) +
+  geom_point(size = 2) +
+  geom_errorbarh(
+    aes(xmin=conf.low, xmax=conf.high), 
+    height=.2
+    )+ 
+  labs(
+    title = &quot;Slope&quot;, 
+    x = &quot;Estimate&quot;, 
+    y = &quot;Team&quot;, 
+    caption = &quot;95% CI error bars \n all estimates were significant (p&lt;.05)&quot;
+    )+
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Here we performed a level two model on this data to understand league-wide three pointer performance from 2000-2021:</p>
+<pre class="r"><code>level2omni &lt;- 
+  level1omni %&gt;%
+  nest_by(term) %&gt;%
+  mutate(
+    mod = list(lm(estimate ~ 1, data = data))
+    )
+
+level2omni %&gt;%
+  summarise(broom::tidy(mod, conf.int = TRUE, conf.level = 0.95)) %&gt;%
+  mutate(model = c(&quot;Intercept&quot;, &quot;Slope&quot;)) %&gt;%
+  relocate(model)</code></pre>
+<pre><code>## # A tibble: 2 × 8
+## # Groups:   term [1]
+##   model     term        estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Intercept (Intercept)    7.36     0.124       59.3 8.15e-32    7.11      7.62 
+## 2 Slope     (Intercept)    0.344    0.0153      22.5 6.57e-20    0.313     0.376</code></pre>
+<p>These results showed that the league on average increased by 0.344 three pointers per season. In other words for each decade of play there were an average of over 3 more three pointers per game since the start of the decade. From 2000-2021 the average team made more than 7 three pointers per game.</p>
+<p>Next we tried to find if there were any variables that were causing this increase in three pointers. One promising statistic was offensive rebounding.</p>
+<p>Here we extracted the data:</p>
+<pre class="r"><code>games_oreb_sum &lt;- rs_game_logs %&gt;% 
+  select(idGame, orebTeam, yearSeason) %&gt;%
+  group_by(idGame, yearSeason) %&gt;%
+  summarise(oreb_sum = sum(orebTeam)) %&gt;%
+  ungroup()</code></pre>
+<p>Then we calculated the mean offensive rebounds and visualized them over the last 20 years:</p>
+<pre class="r"><code>mean_oreb_season &lt;- games_oreb_sum %&gt;%
+  group_by(yearSeason)%&gt;%
+  summarise(mean_oreb_sum = mean(oreb_sum))%&gt;%
+  ungroup()
+
+ggplot(data = mean_oreb_season, aes(x = yearSeason, y = mean_oreb_sum))+
+  geom_point(data = games_oreb_sum, 
+             aes(x = yearSeason, y = oreb_sum), 
+             position = position_jitter(.22))+
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;white&quot;, alpha = 1/3, color = &quot;green&quot;)+
+  geom_smooth(method = &quot;lm&quot;, color = &quot;red&quot;)+
+  labs(x = &quot;Season&quot;, y = &quot;Offensive Rebounds per Game&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>We noticed that there was a clear decrease in offensive rebounds throughout the years and we decided to dive deeper into this variable.</p>
+<p>Here we graphed the offensive rebounding data across all thirty teams:</p>
+<pre class="r"><code>ggplot(orebfg3_data_newnames, aes(season, orebTeam)) +
+  geom_point(position = pj, alpha = 1/3, shape = 1) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE, color = &quot;red&quot;) +
+  labs(x = &quot;Season&quot;, y = &quot;Offensive Rebounds&quot;) +
+  theme_classic() +
+  facet_wrap(~team)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Next we performed multi-level modeling and collected all thirty of the linear models into a data set:</p>
+<pre class="r"><code>oreb_mods &lt;-  
+  orebfg3_data_newnames %&gt;%
+  nest_by(team) %&gt;%
+  mutate(mod = list(lm(orebTeam ~ 1 + scale(season, scale = FALSE), data = data)))
+
+level1orebomni &lt;-
+  oreb_mods %&gt;%
+  summarise(broom::tidy(mod, conf.int = TRUE, conf.level = 0.95)) %&gt;%
+  ungroup() %&gt;%
+  mutate(
+    sig = p.value &lt; 0.05,
+    term = case_when(
+      term == &quot;(Intercept)&quot; ~ &quot;Intercept&quot;,
+      term == &quot;scale(season, scale = FALSE)&quot; ~ &quot;season&quot;
+    )
+  )</code></pre>
+<p>We graphed the slopes and intercepts to see if they were significant here:</p>
+<pre class="r"><code>ggplot(level1orebomni, aes(estimate, reorder(team, estimate), color = sig)) +
+  geom_point(size = 2) +
+  facet_wrap(~term, scales = &quot;free&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(
+  level1orebomni %&gt;% filter(term == &quot;Intercept&quot;), 
+  aes(estimate, reorder(team, estimate), color = sig)
+) +
+  geom_point(size = 2) +
+  coord_cartesian(xlim = c(9, 13)) +
+  geom_errorbarh(
+    aes(xmin=conf.low, xmax=conf.high), 
+    height=.2
+  )+
+  labs(x = &quot;Intercept&quot;, y = &quot;Team&quot;, caption = &quot;95% CI error bars&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(
+  level1orebomni %&gt;% filter(term == &quot;season&quot;), 
+  aes(estimate, reorder(team, estimate), color = sig)
+) +
+  geom_point(size = 2) +
+  geom_errorbarh(
+    aes(xmin=conf.low, xmax=conf.high), 
+    height=.2
+  )+
+    labs(x = &quot;Slope&quot;, y = &quot;Team&quot;, caption = &quot;95% CI error bars&quot;)</code></pre>
+<p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-14-3.png" width="672" /></p>
+<p>When we looked at the graph for the intercepts, it showed that everything was statistically significant. The graph for the slopes however, had one slope that wasn’t statistically significant, the Knicks. In addition the Warriors were clearly separated from the rest of the teams in terms of how much the offensive rebounding had decreased every year.</p>
+<p>Now let’s look how offensive rebounds decreased on average across the league during this time period:</p>
+<pre class="r"><code>level2orebomni &lt;- 
+  level1orebomni %&gt;%
+  nest_by(term) %&gt;%
+  mutate(
+    mod = list(lm(estimate ~ 1, data = data))
+  )
+
+lvl2_off_reb_res &lt;- 
+  level2orebomni %&gt;%
+  summarise(broom::tidy(mod, conf.int = TRUE, conf.level = 0.95)) %&gt;%
+  mutate(model = c(&quot;Intercept&quot;, &quot;Slope&quot;)) %&gt;%
+  relocate(model)
+print(lvl2_off_reb_res)</code></pre>
+<pre><code>## # A tibble: 2 × 8
+## # Groups:   term [1]
+##   model     term        estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Intercept (Intercept)   11.1      0.0893     124.  4.26e-41   10.9     11.3   
+## 2 Slope     (Intercept)   -0.116    0.0111     -10.5 2.40e-11   -0.138   -0.0931</code></pre>
+<p>These results showed that the league on average decreased by -0.12 offensive rebounds per season. In other words for each descade of play there was an average of over 1 less offensive rebound per game since the start of the decade. From 2000-2021 the average team had more than 11 offensive rebounds per game.</p>
+<p>During this analysis we showed that there was a clear increase in three pointers throughout the past two decades. Along with this offensive rebounds decreased which could be a possible factor in the three point shooting increase. Although there is more analysis needed to confirm that these two variables caused changes in the other it is possible that they are connected. It is likely that the change in three point shooting in recent years has caused the decline of offensive rebounding because less emphasis on interior scoring has lowered the probability of getting an offensive rebound.</p>
+<p><br ></p>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

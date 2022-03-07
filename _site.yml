@@ -8,5 +8,5 @@ navbar:
       href: index.html
 output:
   html_document:
-    theme: darkly
+    theme: yeti
     highlight: textmate
