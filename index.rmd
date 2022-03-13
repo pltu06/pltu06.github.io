@@ -1,5 +1,8 @@
 ---
-title: "My Website"
+title: "Patrick Tu"
 ---
-  
-  <a href="https://pltu06.github.io/three_pointer_blog_post.html" class="btn btn-danger" role="button">Analysis of the NBA's Three Pointer Boom</a>
+  <br >
+  <br >
+  <i class="fa-solid fa-basketball fa-2x"></i>
+  <i class="fa-solid fa-chart-line fa-2x"></i>
+  <a href="https://pltu06.github.io/three_pointer_blog_post.html" class="btn btn-primary" role="button">Analysis of the NBA's Three Pointer Boom</a>

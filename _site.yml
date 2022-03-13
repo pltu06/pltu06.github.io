@@ -2,11 +2,13 @@ name: "my-website"
 output_dir: "."
 exclude: ["README.md"]
 navbar:
-  title: "My Website"
+  title: "Patrick Tu"
   left:
-    - text: "Home"
+    - text: <i class="fa-solid fa-house"></i>
       href: index.html
 output:
   html_document:
     theme: darkly
     highlight: textmate
+    include:
+      before_body: icons.html
