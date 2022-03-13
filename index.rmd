@@ -2,4 +2,4 @@
 title: "My Website"
 ---
     
-To read my first blog post on my analysis of three pointers in the NBA click [here](https://pltu06.github.io/three_pointer_blog_post.html).
+ [Analysis of Three Pointer Boom in the NBA](https://pltu06.github.io/three_pointer_blog_post.html).
