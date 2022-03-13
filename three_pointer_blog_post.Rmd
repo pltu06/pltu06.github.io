@@ -60,7 +60,7 @@ ggplot(data = mean_3ptsa_season, aes(x = yearSeason, y = mean_3ptsa_sum))+
   labs(x = "Season", y = "3 Pointers Attempted During Game")
 ```
 
-The plot revealed that there was a clear increase in three pointers made over the last twenty-one years in the NBA and we decided to perform a deeper analysis on the data.
+The plot revealed that there was a clear increase in three pointers made over the last twenty-one years in the NBA. We decided to further explore this topic to see if this true for all thirty teams.
 
 We extracted the data using:
 
@@ -131,6 +131,8 @@ ggplot(orebfg3_data_newnames, aes(season, fg3mTeam)) +
   theme_classic() +
   facet_wrap(~team)
 ```
+
+The graph revealed that all of the NBA's teams had a clear increase in three pointers made over this time period. It was clear that some teams certainly increased more than others so we decided that we should see which teams increased the most and which increased the least.
 
 Next we decided to perform multi-level modeling and we collected all thirty of the linear models into a data set:
 

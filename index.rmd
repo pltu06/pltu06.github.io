@@ -1,5 +1,5 @@
 ---
 title: "My Website"
 ---
-    
- [Analysis of Three Pointer Boom in the NBA](https://pltu06.github.io/three_pointer_blog_post.html).
+  
+  <a href="https://pltu06.github.io/three_pointer_blog_post.html" class="btn btn-danger" role="button">Analysis of the NBA's Three Pointer Boom</a>
