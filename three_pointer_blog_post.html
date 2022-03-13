@@ -17,7 +17,7 @@
 <script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
@@ -292,7 +292,7 @@ ggplot(data = mean_3ptsa_season, aes(x = yearSeason, y = mean_3ptsa_sum))+
   geom_smooth(method = &quot;lm&quot;, color = &quot;red&quot;)+
   labs(x = &quot;Season&quot;, y = &quot;3 Pointers Attempted During Game&quot;)</code></pre>
 <p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>The plot revealed that there was a clear increase in three pointers made over the last twenty years in the NBA and we decided to perform a deeper analysis on the data.</p>
+<p>The plot revealed that there was a clear increase in three pointers made over the last twenty-one years in the NBA. We decided to further explore this topic to see if this true for all thirty teams.</p>
 <p>We extracted the data using:</p>
 <pre class="r"><code>orebfg3_data &lt;- 
   rs_game_logs %&gt;%
@@ -356,6 +356,7 @@ ggplot(orebfg3_data_newnames, aes(season, fg3mTeam)) +
   theme_classic() +
   facet_wrap(~team)</code></pre>
 <p><img src="three_pointer_blog_post_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The graph revealed that all of the NBA’s teams had a clear increase in three pointers made over this time period. It was clear that some teams certainly increased more than others so we decided that we should see which teams increased the most and which increased the least.</p>
 <p>Next we decided to perform multi-level modeling and we collected all thirty of the linear models into a data set:</p>
 <pre class="r"><code>fg3_data_mod &lt;- 
   orebfg3_data_newnames %&gt;%
