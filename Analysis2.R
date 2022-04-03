@@ -2,9 +2,7 @@
 #MARCH 13, 2022
 #1. Find a way to get the stats we need into R, either by the package or downloading data from a website
 #2. Figure out what you are going to do with the data
-library(tidyverse)
-library(nbastatR)
-library(Hmisc)
+source("R-Prep.R")
 library(ghibli)
 
 #MARCH 27, 2022
