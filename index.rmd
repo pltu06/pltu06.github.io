@@ -1,8 +1,23 @@
 ---
-title: "Patrick Tu"
+title: ""
 ---
-  <br >
-  <br >
+
+## About Me
+
+I'm a high school student learning R. I've always been interested in numbers and basketball and I'm applying R to writing blog posts on the NBA.
+<br >
+<br >
+
+## Blog Posts
+
+Click below for the links to my individual blog posts
+  
   <i class="fa-solid fa-basketball fa-2x"></i>
   <i class="fa-solid fa-chart-line fa-2x"></i>
   <a href="https://pltu06.github.io/three_pointer_blog_post.html" class="btn btn-primary" role="button">Analysis of the NBA's Three Pointer Boom</a>
+
+  <i class="fa-solid fa-basketball fa-2x"></i>
+  <i class="fa-solid fa-chart-line fa-2x"></i>
+  <a href="https://pltu06.github.io/JokicvEmbiid.html" class="btn btn-primary" role="button">Jokic vs. Embiid</a>
+  
+  
