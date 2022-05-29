@@ -1,54 +1,35 @@
-source("R-Prep.R")
+#load packages----
+library(nbastatR) #This is for loading NBA data
+library(dplyr) #This is for manipulating data sets
+library(ggplot2) #This is for graphing data
+library(tidyr) # functions for tidying data
+library(Hmisc) # loads the %nin% filter
 library(ghibli) #for additional colors
+#necessary for loading in NBA data----
+Sys.setenv("VROOM_CONNECTION_SIZE" = 131072 * 2)
 
-sum_numbers <- function(x = numbers, y = number2){
-  y <- x^2
-  z <- y^2
-  return(list(y, z))
-} 
-
-list_of_numbers <- c(1, 2) 
-
-result <- sum_numbers(x = list_of_numbers)
-
-# Write a function that takes a list of numbers and concatenate a letter to them
-my_function(c(1, 2, 3))
-
-letter_number <- function(x = numbers){
- y <- paste0(x, letters[1:length(x)]) 
- return(y)
-}
-
-letter_number(x = c(5,4,30,4567,1,701))
-
-###
-
-
-player1 <- "Nikola Jokic"; player2 <- "Joel Embiid"
-table <- c("per_game", "advanced")
-season <- 2022
 
 player_comparison <- function(
   player1 = "Nikola Jokic",
   player2 = "Joel Embiid", 
   table = c("per_game", "advanced"),
   season = 2022
-  )
-  {
+)
+{
   player_filter <- c(player1, player2)
   this_data <- vector(mode = "list", length(table)) # initialization
   
   for (i in 1:length(table)) {
     this_data[[i]] <- 
       bref_players_stats(
-      seasons = season,
-      tables = table[i],
-      assign_to_environment = FALSE
-    ) %>%
+        seasons = season,
+        tables = table[i],
+        assign_to_environment = FALSE
+      ) %>%
       # Filtering for players
       filter(namePlayer %in% player_filter)
   }
-
+  
   # Converting data into long format:
   
   # ADVANCED DATA
@@ -63,9 +44,9 @@ player_comparison <- function(
     
     adv_player_graphs <- 
       ggplot(
-      data = adv_player_data_long %>% filter(name%nin%"ratioVORP"), 
-      aes(x = Last, y = value, fill = namePlayer)
-    ) +
+        data = adv_player_data_long %>% filter(name%nin%"ratioVORP"), 
+        aes(x = Last, y = value, fill = namePlayer)
+      ) +
       geom_bar(stat = "identity") +
       facet_wrap(~name, scales = "free") +
       labs(title = "Advanced Data", x = "Player", y = "Value") +
@@ -92,7 +73,7 @@ player_comparison <- function(
       ggplot(
         data = per_player_data_long, 
         aes(x = Last, y = value, fill = namePlayer)
-    ) +
+      ) +
       geom_bar(stat = "identity") +
       facet_wrap(~name, scales = "free") +
       labs(title = "Per Game Data", x = "Player", y = "Value") +
@@ -100,24 +81,8 @@ player_comparison <- function(
       scale_fill_manual(values = ghibli_palettes$YesterdayMedium[c(4,7)]) +
       theme(legend.position = "none")
   }
- 
-
+  
+  
   #Printing graphs
   print(adv_player_graphs); print(per_player_graphs)
 }
-
-player_comparison(
-  player1 = "Darius Garland", 
-  player2 = "Russell Westbrook",
-  table = c("advanced", "per_game"),
-  season = 2021
-  )
-
-# Assignment
-# 1. Accomodate function for per game stats
-# 2. Accomodate function for different years (user enters year = "2001")
-# 3. Comment your code so that it is understandable
-
-# Assignment 5/15/22
-# 1. Start a blog post on the function
-# 2. Source the function on git hub https://stackoverflow.com/questions/35720660/how-to-use-an-r-script-from-github
