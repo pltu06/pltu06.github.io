@@ -1,11 +1,11 @@
-#load packages----
+#load packages
 library(nbastatR) #This is for loading NBA data
 library(dplyr) #This is for manipulating data sets
 library(ggplot2) #This is for graphing data
 library(tidyr) # functions for tidying data
 library(Hmisc) # loads the %nin% filter
 library(ghibli) #for additional colors
-#necessary for loading in NBA data----
+#necessary for loading in NBA data
 Sys.setenv("VROOM_CONNECTION_SIZE" = 131072 * 2)
 
 
