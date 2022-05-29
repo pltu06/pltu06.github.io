@@ -53,6 +53,9 @@ player_comparison <- function(
       theme_minimal() +
       scale_fill_manual(values = ghibli_palettes$YesterdayMedium[c(4,7)]) +
       theme(legend.position = "none")
+    
+    # Prints plot
+    print(adv_player_graphs)
   }
   
   # PER GAME DATA
@@ -80,9 +83,10 @@ player_comparison <- function(
       theme_minimal() +
       scale_fill_manual(values = ghibli_palettes$YesterdayMedium[c(4,7)]) +
       theme(legend.position = "none")
+    
+    # Plots graph
+    print(per_player_graphs)
+    
   }
   
-  
-  #Printing graphs
-  print(adv_player_graphs); print(per_player_graphs)
 }
