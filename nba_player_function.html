@@ -264,9 +264,150 @@ $(document).ready(function () {
 </div>
 
 
-<p>First we prepped our data space</p>
+<p>I developed a function that compares two players in the NBA using the <code>nbastatR</code> package. The function compares the players based on their advanced and/or per game statistics.</p>
+<p>If you want to use this function it is on my github here is how you would source it onto your workspace.</p>
+<p><em>Notes:</em> If you want to use the function you will have to download the <code>nbastatR</code>, <code>dplyr</code>, <code>ggplot2</code>, <code>tidyr</code>, <code>Hmisc</code>, <code>ghibli</code> packages.</p>
 <pre class="r"><code>library(devtools)
 source_url(&quot;https://raw.githubusercontent.com/pltu06/pltu06.github.io/main/NBA_player_function.R&quot;)</code></pre>
+<p>Here’s some different ways to use the function.</p>
+<p>First, let’s compare Jimmy Butler and Jaysom Tatum:</p>
+<pre class="r"><code>player_comparison(
+  player1 = &quot;Jimmy Butler&quot;,
+  player2 = &quot;Jayson Tatum&quot;, 
+  table = c(&quot;per_game&quot;, &quot;advanced&quot;),
+  season = 2022
+)</code></pre>
+<pre><code>## parsed http://www.basketball-reference.com/leagues/NBA_2022_per_game.html
+## PerGame
+## parsed http://www.basketball-reference.com/leagues/NBA_2022_advanced.html
+## Advanced</code></pre>
+<p><img src="nba_player_function_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="nba_player_function_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<p><br > <br ></p>
+<p>You can even change the year for comparison as long as both players played in that year. Let’s look at 2021:</p>
+<pre class="r"><code>player_comparison(
+  player1 = &quot;Jimmy Butler&quot;,
+  player2 = &quot;Jayson Tatum&quot;, 
+  table = c(&quot;per_game&quot;, &quot;advanced&quot;),
+  season = 2021
+)</code></pre>
+<pre><code>## parsed http://www.basketball-reference.com/leagues/NBA_2021_per_game.html
+## PerGame
+## parsed http://www.basketball-reference.com/leagues/NBA_2021_advanced.html
+## Advanced</code></pre>
+<p><img src="nba_player_function_files/figure-html/unnamed-chunk-3-1.png" width="672" /><img src="nba_player_function_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p><br> <br></p>
+<p>If you only want the per game statistics do this</p>
+<pre class="r"><code>player_comparison(
+  player1 = &quot;Jimmy Butler&quot;,
+  player2 = &quot;Jayson Tatum&quot;, 
+  table = c(&quot;per_game&quot;),
+  season = 2021
+)</code></pre>
+<pre><code>## PerGame</code></pre>
+<p><img src="nba_player_function_files/figure-html/unnamed-chunk-4-1.png" width="672" /> <br> <br></p>
+<p>If you want to have only the advanced statistics do this</p>
+<pre class="r"><code>player_comparison(
+  player1 = &quot;Jimmy Butler&quot;,
+  player2 = &quot;Jayson Tatum&quot;, 
+  table = c(&quot;advanced&quot;),
+  season = 2021
+)</code></pre>
+<pre><code>## Advanced</code></pre>
+<p><img src="nba_player_function_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Here’s the code that goes into that function. You can also see it on github <a href="https://github.com/pltu06/pltu06.github.io/blob/main/NBA_player_function.R">here</a></p>
+<pre class="r"><code>#load packages
+library(nbastatR) #This is for loading NBA data
+library(dplyr) #This is for manipulating data sets
+library(ggplot2) #This is for graphing data
+library(tidyr) # functions for tidying data
+library(Hmisc) # loads the %nin% filter
+library(ghibli) #for additional colors
+#necessary for loading in NBA data
+Sys.setenv(&quot;VROOM_CONNECTION_SIZE&quot; = 131072 * 2)
+
+
+player_comparison &lt;- function(
+  player1 = &quot;Nikola Jokic&quot;,
+  player2 = &quot;Joel Embiid&quot;, 
+  table = c(&quot;per_game&quot;, &quot;advanced&quot;),
+  season = 2022
+)
+{
+  player_filter &lt;- c(player1, player2)
+  this_data &lt;- vector(mode = &quot;list&quot;, length(table)) # initialization
+  
+  for (i in 1:length(table)) {
+    this_data[[i]] &lt;- 
+      bref_players_stats(
+        seasons = season,
+        tables = table[i],
+        assign_to_environment = FALSE
+      ) %&gt;%
+      # Filtering for players
+      filter(namePlayer %in% player_filter)
+  }
+  
+  # Converting data into long format:
+  
+  # ADVANCED DATA
+  if (sum(table == &quot;advanced&quot;)&gt;0) {
+    this_index &lt;- which(table == &quot;advanced&quot;)
+    
+    adv_player_data_long &lt;- 
+      this_data[[this_index]] %&gt;%
+      select(namePlayer, yearSeason, minutes:ratioVORP) %&gt;%
+      pivot_longer(cols = c(-namePlayer, -yearSeason)) %&gt;%
+      separate(col = namePlayer, into = c(&quot;First&quot;, &quot;Last&quot;), remove = FALSE)
+    
+    adv_player_graphs &lt;- 
+      ggplot(
+        data = adv_player_data_long %&gt;% filter(name%nin%&quot;ratioVORP&quot;), 
+        aes(x = Last, y = value, fill = namePlayer)
+      ) +
+      geom_bar(stat = &quot;identity&quot;) +
+      facet_wrap(~name, scales = &quot;free&quot;) +
+      labs(title = &quot;Advanced Data&quot;, x = &quot;Player&quot;, y = &quot;Value&quot;) +
+      theme_minimal() +
+      scale_fill_manual(values = ghibli_palettes$YesterdayMedium[c(4,7)]) +
+      theme(legend.position = &quot;none&quot;)
+    
+    # Prints plot
+    print(adv_player_graphs)
+  }
+  
+  # PER GAME DATA
+  if (sum(table == &quot;per_game&quot;)&gt;0) {
+    this_index &lt;- which(table == &quot;per_game&quot;)
+    
+    per_player_data_long &lt;- 
+      this_data[[this_index]] %&gt;%
+      select(namePlayer, 
+             yearSeason, 
+             countGames, 
+             pctFG:pctFT, 
+             minutesPerGame:ptsPerGame) %&gt;%
+      pivot_longer(cols = c(-namePlayer, -yearSeason)) %&gt;%
+      separate(col = namePlayer, into = c(&quot;First&quot;, &quot;Last&quot;), remove = FALSE)
+    
+    per_player_graphs &lt;- 
+      ggplot(
+        data = per_player_data_long, 
+        aes(x = Last, y = value, fill = namePlayer)
+      ) +
+      geom_bar(stat = &quot;identity&quot;) +
+      facet_wrap(~name, scales = &quot;free&quot;) +
+      labs(title = &quot;Per Game Data&quot;, x = &quot;Player&quot;, y = &quot;Value&quot;) +
+      theme_minimal() +
+      scale_fill_manual(values = ghibli_palettes$YesterdayMedium[c(4,7)]) +
+      theme(legend.position = &quot;none&quot;)
+    
+    # Plots graph
+    print(per_player_graphs)
+    
+  }
+  
+}</code></pre>
+<p><br></p>
 
 
 
