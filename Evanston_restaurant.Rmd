@@ -1,9 +1,35 @@
+---
+title: "Evanston Restaurant Food Violations"
+author: "Patrick Tu"
+date: '2022-08-28'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  error = FALSE,
+  message = FALSE)
+```
+
+For our next R analysis I decided to focus on the town where we live, Evanston. We decided to analyze which restaurants in Evanston had the most food violations and map the data.
+
+One thing to note about this data is it is from 2019 and some of the restaurants mapped are no longer open.
+
+First we prepped our data space.
+
+```{r}
 library(ggmap)
 library(tidyverse)
 library(osmdata)
 library(sf)
 library(plotly)
+```
 
+Next we brought in and edited the data sets we would be using for this analysis.
+
+```{r}
 # Data sets for project
 restaurants <- 
   read_csv(file = "Data/Evanston_restaurants.csv") %>%
@@ -35,7 +61,11 @@ violations <-
   mutate(violation_date = as.Date(violation_date, format = "%m/%d/%Y"))
 
 violation_data <- left_join(violations, restaurants, by = "business_license")
+```
 
+Then we set the coordinates of the map we would be using to plot the data.
+
+```{r}
 # Evanston
 coords <- matrix(c(-87.7324, -87.6623, 42.0189, 42.0714), 
                  byrow = TRUE, nrow = 2, 
@@ -43,11 +73,11 @@ coords <- matrix(c(-87.7324, -87.6623, 42.0189, 42.0714),
                  dimnames = list(c('x','y'),
                                  c('min','max'))) 
 location <- coords %>% opq()
+```
 
-#ggplot() + 
- # geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
-  #theme_minimal()
+Then we added features we would need to put on the map such as roads, transportation, and parks.
 
+```{r}
 #build different types of streets
 main_st <- 
   data.frame(
@@ -104,7 +134,11 @@ parks <-
     )
   ) %>%
   osmdata_sf()
+```
 
+Here we mapped all of the restaurants in Evanston.
+
+```{r}
 #plot map
 ggplot() + 
   geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
@@ -125,7 +159,11 @@ evanston_map <- ggplot() +
   ) + 
   theme_minimal()
 evanston_map
+```
 
+We wanted the nap to be a little more interesting and show which restaurants have three or more critical food violations so we decided to create new data sets that would tell us which restaurants have the most frequent violations.
+
+```{r}
 freq_vio <- violation_data %>%
   select(violation, comments, business_name, lat, long) %>%
   mutate(
@@ -154,19 +192,16 @@ ggplot(data = freq_vio_sum,
 freq_res_vio <- freq_vio %>%
   count(business_name, crit_vio)
 
-# Assignment
-# 1. Map all restaurants with more than two critical violations
-# 2. Try to get plotly to work https://plotly.com/ggplot2/ 
-# 3. Look at a package that make tables in html 
-#https://rfortherestofus.com/2019/11/how-to-make-beautiful-tables-in-r/
-#4. Print off regular expressions cheatsheet
-
 filter_vio <- filter(freq_res_vio, n > 2, crit_vio == TRUE)
 
 three_vio_res <- filter(freq_vio, 
                         business_name %in% filter_vio$business_name, 
                         crit_vio == TRUE)
+```
 
+After creating new data sets we mapped the new data here.
+
+```{r}
 ggplot() + 
   geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
   theme_minimal()
@@ -197,17 +232,4 @@ evanston_vio_map <- ggplot() +
     )
 
 ggplotly(evanston_vio_map)
-
-test <- three_vio_res %>% nest_by(business_name)
-
-comb_vio_res <- three_vio_res %>%
-  group_by(business_name, lat, long) %>%
-  summarise(vio = list(violations))
-
-save(three_vio_res, file = "three_vio_res.rda")
-
-# Assignment:
-# 1) start writing up the blog post for publication on website in RMarkdown.
-
-
-
+```
