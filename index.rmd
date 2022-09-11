@@ -23,3 +23,8 @@ Click below for the links to my individual blog posts
   <i class="fa-solid fa-basketball fa-2x"></i>
   <i class="fa-solid fa-chart-line fa-2x"></i>
   <a href="https://pltu06.github.io/nba_player_function.html" class="btn btn-primary" role="button">NBA Player Comparison Function</a>  
+  
+  <i class="fa-solid fa-tree-city fa-2x"></i>
+  <i class="fa-regular fa-map fa-2x"></i>
+  <a href="https://pltu06.github.io/Evanston_restaurant.html" class="btn btn-primary" role="button">Evanston Restaurant Violations Map</a>  
+  
