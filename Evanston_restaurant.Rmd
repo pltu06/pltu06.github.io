@@ -7,17 +7,16 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE,
-  warning = FALSE,
-  error = FALSE,
-  message = FALSE)
+	echo = FALSE,
+	error = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
 ```
 
 For our next R analysis I decided to focus on the town where we live, Evanston. We decided to analyze which restaurants in Evanston had the most food violations and map the data.
 
-One thing to note about this data is it is from 2019 and some of the restaurants mapped are no longer open.
-
-First we prepped our data space.
+One thing to note about this data is it is from 2019 and some of the restaurants mapped are no longer open. Here's the link for the [violations data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Violations/spu5-riv2) and the [restaurants data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Businesses/vu4y-h82f) we used for this analysis.
 
 ```{r}
 library(ggmap)
@@ -26,8 +25,6 @@ library(osmdata)
 library(sf)
 library(plotly)
 ```
-
-Next we brought in and edited the data sets we would be using for this analysis.
 
 ```{r}
 # Data sets for project
@@ -63,8 +60,6 @@ violations <-
 violation_data <- left_join(violations, restaurants, by = "business_license")
 ```
 
-Then we set the coordinates of the map we would be using to plot the data.
-
 ```{r}
 # Evanston
 coords <- matrix(c(-87.7324, -87.6623, 42.0189, 42.0714), 
@@ -74,8 +69,6 @@ coords <- matrix(c(-87.7324, -87.6623, 42.0189, 42.0714),
                                  c('min','max'))) 
 location <- coords %>% opq()
 ```
-
-Then we added features we would need to put on the map such as roads, transportation, and parks.
 
 ```{r}
 #build different types of streets
@@ -136,14 +129,10 @@ parks <-
   osmdata_sf()
 ```
 
-Here we mapped all of the restaurants in Evanston.
+Here we mapped all restaurants in Evanston in 2019. As you can see there are several clusters of restaurants most notably the downtown area near the center of the map.
 
 ```{r}
 #plot map
-ggplot() + 
-  geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
-  theme_minimal()
-
 evanston_map <- ggplot() + 
   geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
   geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
@@ -161,7 +150,7 @@ evanston_map <- ggplot() +
 evanston_map
 ```
 
-We wanted the nap to be a little more interesting and show which restaurants have three or more critical food violations so we decided to create new data sets that would tell us which restaurants have the most frequent violations.
+We noticed most restaurants in Evanston had two or less critical food violations so we decided that we would plot all of the restaurants with three or more critical violations. We decided to create a bar graph of which violations were the most common before plotting the data on the map.
 
 ```{r}
 freq_vio <- violation_data %>%
@@ -199,13 +188,9 @@ three_vio_res <- filter(freq_vio,
                         crit_vio == TRUE)
 ```
 
-After creating new data sets we mapped the new data here.
+Next we created an interactive map of all the restaurants in Evanston with three or more critical violation. We used the package plotly for this.
 
 ```{r}
-ggplot() + 
-  geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
-  theme_minimal()
-
 evanston_vio_map <- ggplot() + 
   geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
   geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
@@ -233,3 +218,5 @@ evanston_vio_map <- ggplot() +
 
 ggplotly(evanston_vio_map)
 ```
+
+As with the previous map the downtown area has the highest concentration of restaurants with critical violations. Each data point has the name of the business, violation, and coordinates listed. In the future we may do more data analysis projects that focus on Evanston.

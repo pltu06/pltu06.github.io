@@ -106,10 +106,6 @@ parks <-
   osmdata_sf()
 
 #plot map
-ggplot() + 
-  geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
-  theme_minimal()
-
 evanston_map <- ggplot() + 
   geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
   geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
@@ -167,10 +163,6 @@ three_vio_res <- filter(freq_vio,
                         business_name %in% filter_vio$business_name, 
                         crit_vio == TRUE)
 
-ggplot() + 
-  geom_sf(data = water$osm_multipolygons, fill = 'light blue') + 
-  theme_minimal()
-
 evanston_vio_map <- ggplot() + 
   geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
   geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
@@ -198,16 +190,45 @@ evanston_vio_map <- ggplot() +
 
 ggplotly(evanston_vio_map)
 
-test <- three_vio_res %>% nest_by(business_name)
+merge_vio <- 
+  three_vio_res %>%
+  group_by(business_name) %>%
+  mutate(violations = toString(violation)) %>%
+  mutate(violations = gsub("., ", "\r", violations, fixed = TRUE))
 
-comb_vio_res <- three_vio_res %>%
-  group_by(business_name, lat, long) %>%
-  summarise(vio = list(violations))
+vio_merge_map <- ggplot() + 
+  geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
+  geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
+  geom_sf(data = water$osm_multipolygons, fill = '#c6e1e3') +
+  geom_sf(data = streets$osm_lines, size = 0.75, color = '#eedede') +
+  geom_sf(data = main_streets$osm_lines, color = '#ff9999', size = 0.5) + 
+  geom_sf(data = rail$osm_lines, color = '#596060', size = 1) +
+  geom_point(data = merge_vio, 
+             size = 0.75, aes(
+               x = long, 
+               y = lat, 
+               group = business_name, color = violations), alpha = 0.5)+
+  scale_color_manual(values = rep("black", 49))+
+  coord_sf(
+    xlim = c(coords[1], coords[1,2]), 
+    ylim = c(coords[2], coords[2,2]), 
+    expand = TRUE
+  ) + 
+  theme_minimal()+
+  theme(
+    legend.position = "none", 
+    axis.text = element_blank(), 
+    axis.title = element_blank()
+  )
 
-save(three_vio_res, file = "three_vio_res.rda")
+ggplotly(vio_merge_map)
 
 # Assignment:
 # 1) start writing up the blog post for publication on website in RMarkdown.
 
+
+#Assignment:
+#1) Clean up blog post, reference website used for data
+#2) Fold most of the code used to create map
 
 
