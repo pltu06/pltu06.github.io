@@ -2,12 +2,14 @@
 title: "Evanston Restaurant Food Violations"
 author: "Patrick Tu"
 date: '2022-08-28'
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-	echo = FALSE,
+	echo = TRUE,
 	error = FALSE,
 	message = FALSE,
 	warning = FALSE
@@ -16,7 +18,7 @@ knitr::opts_chunk$set(
 
 For our next R analysis I decided to focus on the town where we live, Evanston. We decided to analyze which restaurants in Evanston had the most food violations and map the data.
 
-One thing to note about this data is it is from 2019 and some of the restaurants mapped are no longer open. Here's the link for the [violations data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Violations/spu5-riv2) and the [restaurants data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Businesses/vu4y-h82f) we used for this analysis.
+One thing to note about this data is it is from 2018-2019 and some of the restaurants mapped are no longer open. Here's the link for the [violations data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Violations/spu5-riv2) and the [restaurants data](https://data.cityofevanston.org/Health-Human-Services/Food-Establishment-Businesses/vu4y-h82f) we used for this analysis.
 
 ```{r}
 library(ggmap)
@@ -61,6 +63,7 @@ violation_data <- left_join(violations, restaurants, by = "business_license")
 ```
 
 ```{r}
+# Code inspired by Mark Padgham and Robin Lovelace(https://cran.r-project.org/web/packages/osmdata/vignettes/osmdata.html)
 # Evanston
 coords <- matrix(c(-87.7324, -87.6623, 42.0189, 42.0714), 
                  byrow = TRUE, nrow = 2, 
@@ -191,19 +194,25 @@ three_vio_res <- filter(freq_vio,
 Next we created an interactive map of all the restaurants in Evanston with three or more critical violation. We used the package plotly for this.
 
 ```{r}
-evanston_vio_map <- ggplot() + 
+merge_vio <- 
+  three_vio_res %>%
+  group_by(business_name) %>%
+  mutate(violations = toString(violation)) %>%
+  mutate(violations = gsub("., ", "\r", violations, fixed = TRUE))
+
+vio_merge_map <- ggplot() + 
   geom_sf(data = parks$osm_polygons, fill = '#94ba8e') +
   geom_sf(data = water$osm_polygons, fill = '#c6e1e3') +
   geom_sf(data = water$osm_multipolygons, fill = '#c6e1e3') +
   geom_sf(data = streets$osm_lines, size = 0.75, color = '#eedede') +
   geom_sf(data = main_streets$osm_lines, color = '#ff9999', size = 0.5) + 
   geom_sf(data = rail$osm_lines, color = '#596060', size = 1) +
-  geom_point(data = three_vio_res, 
+  geom_point(data = merge_vio, 
              size = 0.75, aes(
-    x = long, 
-    y = lat, 
-    group = business_name, color = violation), alpha = 0.5)+
-  scale_color_manual(values = rep("black", 12))+
+               x = long, 
+               y = lat, 
+               group = business_name, color = violations), alpha = 0.5)+
+  scale_color_manual(values = rep("black", 49))+
   coord_sf(
     xlim = c(coords[1], coords[1,2]), 
     ylim = c(coords[2], coords[2,2]), 
@@ -212,11 +221,11 @@ evanston_vio_map <- ggplot() +
   theme_minimal()+
   theme(
     legend.position = "none", 
-        axis.text = element_blank(), 
-        axis.title = element_blank()
-    )
+    axis.text = element_blank(), 
+    axis.title = element_blank()
+  )
 
-ggplotly(evanston_vio_map)
+ggplotly(vio_merge_map)
 ```
 
 As with the previous map the downtown area has the highest concentration of restaurants with critical violations. Each data point has the name of the business, violation, and coordinates listed. In the future we may do more data analysis projects that focus on Evanston.
