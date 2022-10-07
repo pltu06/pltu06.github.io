@@ -6,8 +6,6 @@
 #* API docs: https://dev.socrata.com/foundry/data.cityofevanston.org/25em-v4fn
 #* RSocrata: https://github.com/Chicago/RSocrata
 
-install.packages("RSocrata")
-
 library("RSocrata")
 library("tidyverse")
 
@@ -35,7 +33,7 @@ arrests <-
     into = c("Year", "Month", "Date"), 
     remove = FALSE
     ) %>%
-  mutate(Year = as.numeric(Year)) %>%
+  mutate(Year = as.numeric(Year), age = as.numeric(age)) %>%
   filter(Year > 2016)
   
 
@@ -80,4 +78,71 @@ chisq.test(chi_data_mat) # significant!
 # 2. Average age across races
 # 3. Average age across sex and race
 
+ggplot(arrests%>%
+         filter(complete.cases(sex)), aes(x = age))+
+  geom_histogram(binwidth = 2)+
+  coord_cartesian(xlim = c(0,90))+
+  scale_x_continuous(breaks = seq(0,90,10))+
+  facet_wrap(~sex)
 
+arrests_gender <- arrests %>%
+  filter(complete.cases(sex, age)) %>%
+  group_by(sex) %>%
+  summarise(
+    gender_mean = mean(age), 
+    gender_median = median(age), 
+    gender_sd = sd(age), 
+    gender_sample = n(), 
+    gender_min = min(age), 
+    gender_max = max(age)
+    )
+
+t.test(age~sex, data = arrests, alternative = "two.sided")
+
+ggplot(arrests_gender, aes(x = sex,y = gender_mean))+
+  geom_boxplot()
+
+arrests_race <- arrests %>%
+  filter(complete.cases(race, age))%>%
+  group_by(race) %>%
+  summarise(
+    race_mean = mean(age), 
+    race_median = median(age), 
+    race_sd = sd(age), 
+    race_sample = n(), 
+    race_min = min(age), 
+    race_max = max(age)
+  )
+
+ggplot(arrests_race, aes(x = race, y = race_mean))+
+  geom_point(
+    data = arrests%>%filter(complete.cases(race, age)), 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = "lightgrey", 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = race_mean - race_sd, ymax = race_mean + race_sd), 
+    width = 0.2, color = "darkolivegreen")+
+  geom_point(aes(size = race_sample), color = "darkolivegreen")+
+  theme_bw()+
+  labs(
+    x = "Race", 
+    y = "Average Age", 
+    caption = "Error bars are sd", 
+    title = "Arrests in Evanston by Age and Race"
+    )
+  
+#ASSIGNMENT:
+#1. MAKE GENDER MEAN AGE GRAPH
+#2. HISTOGRAM OF SEX+RACE WITH AGE AS MEASURING VARIABLE use facet_grid()
+#3. CALCULATE ALL THE SUMMARY STATISTICS FOR SEX+RACE AND AGE
+#4. REPLICATE THIS MEAN AGE PLOT WITH SEX+RACE
+
+arrests_race_gender <- arrests %>%
+  group_by(sex, race) %>%
+  summarise(racesex_mean = mean(age, na.rm = TRUE))
+
+ggplot(arrests_race_gender, aes(x = race, y = racesex_mean))+
+  geom_boxplot()
