@@ -33,7 +33,10 @@ arrests <-
     into = c("Year", "Month", "Date"), 
     remove = FALSE
     ) %>%
-  mutate(Year = as.numeric(Year), age = as.numeric(age)) %>%
+  mutate(Year = as.numeric(Year), 
+         age = as.numeric(age), 
+         arrest_time = as.numeric(arrest_time),
+         street_number = as.numeric(street_number)) %>%
   filter(Year > 2016)
   
 
@@ -146,3 +149,86 @@ arrests_race_gender <- arrests %>%
 
 ggplot(arrests_race_gender, aes(x = race, y = racesex_mean))+
   geom_boxplot()
+
+ggplot(arrests_gender, aes(x = sex, y = gender_mean))+
+  geom_point(
+    data = arrests%>%filter(complete.cases(race, age)), 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = "lightgrey", 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = gender_mean - gender_sd, ymax = gender_mean + gender_sd), 
+    width = 0.2, color = "darkolivegreen")+
+  geom_point(aes(size = gender_sample), color = "darkolivegreen")+
+  theme_bw()+
+  labs(
+    x = "Sex", 
+    y = "Average Age", 
+    caption = "Error bars are sd", 
+    title = "Arrests in Evanston by Age and Sex"
+  )
+
+arrests_final <- arrests%>%
+  filter(complete.cases(race, sex))
+
+ggplot(arrests_final, aes(x = age))+
+  geom_histogram(binwidth = 2)+
+  coord_cartesian(xlim = c(0,90))+
+  scale_x_continuous(breaks = seq(0,90,10))+
+ facet_grid(race~sex)
+  
+arrests_racesex <- arrests_final %>%
+  filter(complete.cases(age))%>%
+  group_by(race, sex) %>%
+  summarise(
+    m = mean(age), 
+    med = median(age), 
+    sd = sd(age), 
+    n = n(), 
+    min = min(age), 
+    max = max(age)
+  )%>%
+  ungroup()
+
+ggplot(arrests_racesex, aes(x = race, y = med))+
+  geom_point(
+    data = arrests_final, 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = "lightgrey", 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = med - sd, ymax = med + sd), 
+    width = 0.2, color = "darkolivegreen")+
+  geom_point(aes(size = n), color = "darkolivegreen")+
+  theme_bw()+
+  labs(
+    x = "Race", 
+    y = "Median Age", 
+    caption = "Error bars are sd", 
+    title = "Arrests in Evanston by Race, Sex, and Age"
+  )+
+  facet_wrap(~sex)
+
+arrests_bwmale <- arrests_final%>%
+  filter(complete.cases(age))%>%
+  filter(sex == "Male", race %in% c("White", "Black"))
+
+t.test(age~race, data = arrests_bwmale, alternative = "two.sided")
+
+ggplot(arrests, aes(x = arrest_time))+
+  geom_histogram(binwidth = 5)
+
+ggplot(arrests, aes(x = street_number))+
+  geom_histogram(binwidth = 100)
+
+arrests %>%
+  count(street_number)%>%
+  arrange(-n)
+
+#ASSIGNMENT 10/23/22
+#1. Gather population data for Evanston (race, sex, race+sex)
+#2. Organize script into blog post
