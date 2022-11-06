@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Patrick Tu" />
+
+
+<title>Evanston Arrests</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Patrick Tu</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html"><i class="fa-solid fa-house"></i></a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<script src="https://kit.fontawesome.com/a3ae656b6d.js" crossorigin="anonymous"></script>
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Evanston Arrests</h1>
+<h4 class="author">Patrick Tu</h4>
+<h4 class="date">11/6/2022</h4>
+
+</div>
+
+
+<p>For our next R analysis we decided to focus once again on the city of Evanston, Illinois. This time we are focusing on the demographics of arrests in Evanston using <a href="https://data.cityofevanston.org/Police/Evanston-Arrests/25em-v4fn">this</a> data set from the City of Evanston database. We wanted to know what races, ages, and genders were the most likely to be arrested in Evanston.</p>
+<pre class="r"><code>library(&quot;RSocrata&quot;)
+library(&quot;tidyverse&quot;)
+
+arrests &lt;- 
+  as_tibble(
+    read.socrata(&quot;https://data.cityofevanston.org/resource/25em-v4fn.json&quot;)
+    ) %&gt;%  
+  mutate(
+      day_of_the_week = factor(day_of_the_week),
+      day_of_the_week = fct_relevel(
+        day_of_the_week, 
+        values = c(
+          &quot;Mon&quot;, 
+          &quot;Tue&quot;, 
+          &quot;Wed&quot;, 
+          &quot;Thu&quot;, 
+          &quot;Fri&quot;, 
+          &quot;Sat&quot;, 
+          &quot;Sun&quot; 
+        )
+      )
+    ) %&gt;%
+  separate(
+    col = arrest_date, 
+    into = c(&quot;Year&quot;, &quot;Month&quot;, &quot;Date&quot;), 
+    remove = FALSE
+    ) %&gt;%
+  mutate(Year = as.numeric(Year), 
+         age = as.numeric(age), 
+         arrest_time = as.numeric(arrest_time),
+         street_number = as.numeric(street_number)) %&gt;%
+  filter(Year &gt; 2016)</code></pre>
+<p>We were interested in how arrests have changed over the years and if arrests happen more on certain days of the week so we graphed those variables here</p>
+<pre class="r"><code>ggplot(arrests, aes(x = day_of_the_week))+
+  geom_bar()+
+  facet_wrap(~Year)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(arrests, aes(x = Year))+
+  geom_bar()</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>arrests %&gt;%
+  count(Year)</code></pre>
+<pre><code>## # A tibble: 5 × 2
+##    Year     n
+##   &lt;dbl&gt; &lt;int&gt;
+## 1  2017  1095
+## 2  2018   645
+## 3  2019  1233
+## 4  2020   923
+## 5  2021   646</code></pre>
+<pre class="r"><code>ggplot(arrests, aes(x = Month))+
+  geom_bar() +
+  facet_wrap(~Year, nrow = 1)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code>chi_data_df &lt;- 
+  arrests %&gt;% 
+  count(Year, Month) %&gt;%
+  pivot_wider(
+    id_cols = Month, 
+    names_from = Year, 
+    values_from = n, 
+    names_prefix = &quot;m_&quot;
+    )
+
+chi_data_mat &lt;- chi_data_df %&gt;% select(-Month) %&gt;% as.matrix(.)
+rownames(chi_data_mat) &lt;- chi_data_df$Month
+
+# chi-square test of independence
+chisq.test(chi_data_mat) # significant!</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  chi_data_mat
+## X-squared = 205.67, df = 44, p-value &lt; 2.2e-16</code></pre>
+<p>Next we decided to plot graphs comparing age, race, and gender of those arrested</p>
+<pre class="r"><code>ggplot(arrests%&gt;%
+         filter(complete.cases(sex)), aes(x = age))+
+  geom_histogram(binwidth = 2)+
+  coord_cartesian(xlim = c(0,90))+
+  scale_x_continuous(breaks = seq(0,90,10))+
+  facet_wrap(~sex)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>arrests_gender &lt;- arrests %&gt;%
+  filter(complete.cases(sex, age)) %&gt;%
+  group_by(sex) %&gt;%
+  summarise(
+    gender_mean = mean(age), 
+    gender_median = median(age), 
+    gender_sd = sd(age), 
+    gender_sample = n(), 
+    gender_min = min(age), 
+    gender_max = max(age)
+    )
+
+t.test(age~sex, data = arrests, alternative = &quot;two.sided&quot;)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  age by sex
+## t = 0.80853, df = 1383.8, p-value = 0.4189
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.572061  1.374255
+## sample estimates:
+## mean in group Female   mean in group Male 
+##             34.89005             34.48895</code></pre>
+<pre class="r"><code>arrests_race &lt;- arrests %&gt;%
+  filter(complete.cases(race, age))%&gt;%
+  group_by(race) %&gt;%
+  summarise(
+    race_mean = mean(age), 
+    race_median = median(age), 
+    race_sd = sd(age), 
+    race_sample = n(), 
+    race_min = min(age), 
+    race_max = max(age)
+  )
+
+ggplot(arrests_race, aes(x = race, y = race_mean))+
+  geom_point(
+    data = arrests%&gt;%filter(complete.cases(race, age)), 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = &quot;lightgrey&quot;, 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = race_mean - race_sd, ymax = race_mean + race_sd), 
+    width = 0.2, color = &quot;darkolivegreen&quot;)+
+  geom_point(aes(size = race_sample), color = &quot;darkolivegreen&quot;)+
+  theme_bw()+
+  labs(
+    x = &quot;Race&quot;, 
+    y = &quot;Average Age&quot;, 
+    caption = &quot;Error bars are sd&quot;, 
+    title = &quot;Arrests in Evanston by Age and Race&quot;
+    )</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<pre class="r"><code>arrests_race_gender &lt;- arrests %&gt;%
+  group_by(sex, race) %&gt;%
+  summarise(racesex_mean = mean(age, na.rm = TRUE))
+
+ggplot(arrests_gender, aes(x = sex, y = gender_mean))+
+  geom_point(
+    data = arrests%&gt;%filter(complete.cases(race, age)), 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = &quot;lightgrey&quot;, 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = gender_mean - gender_sd, ymax = gender_mean + gender_sd), 
+    width = 0.2, color = &quot;darkolivegreen&quot;)+
+  geom_point(aes(size = gender_sample), color = &quot;darkolivegreen&quot;)+
+  theme_bw()+
+  labs(
+    x = &quot;Sex&quot;, 
+    y = &quot;Average Age&quot;, 
+    caption = &quot;Error bars are sd&quot;, 
+    title = &quot;Arrests in Evanston by Age and Sex&quot;
+  )</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+<pre class="r"><code>arrests_final &lt;- arrests%&gt;%
+  filter(complete.cases(race, sex))
+
+ggplot(arrests_final, aes(x = age))+
+  geom_histogram(binwidth = 2)+
+  coord_cartesian(xlim = c(0,90))+
+  scale_x_continuous(breaks = seq(0,90,10))+
+ facet_grid(race~sex)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-4.png" width="672" /></p>
+<pre class="r"><code>arrests_racesex &lt;- arrests_final %&gt;%
+  filter(complete.cases(age))%&gt;%
+  group_by(race, sex) %&gt;%
+  summarise(
+    m = mean(age), 
+    med = median(age), 
+    sd = sd(age), 
+    n = n(), 
+    min = min(age), 
+    max = max(age)
+  )%&gt;%
+  ungroup()
+
+ggplot(arrests_racesex, aes(x = race, y = med))+
+  geom_point(
+    data = arrests_final, 
+    aes(y = age), 
+    position = position_jitter(.22), 
+    alpha = 1/2, 
+    color = &quot;lightgrey&quot;, 
+    shape = 1)+
+  geom_errorbar(
+    aes(ymin = med - sd, ymax = med + sd), 
+    width = 0.2, color = &quot;darkolivegreen&quot;)+
+  geom_point(aes(size = n), color = &quot;darkolivegreen&quot;)+
+  theme_bw()+
+  labs(
+    x = &quot;Race&quot;, 
+    y = &quot;Median Age&quot;, 
+    caption = &quot;Error bars are sd&quot;, 
+    title = &quot;Arrests in Evanston by Race, Sex, and Age&quot;
+  )+
+  facet_wrap(~sex)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-5.png" width="672" /></p>
+<pre class="r"><code>arrests_bwmale &lt;- arrests_final%&gt;%
+  filter(complete.cases(age))%&gt;%
+  filter(sex == &quot;Male&quot;, race %in% c(&quot;White&quot;, &quot;Black&quot;))
+
+t.test(age~race, data = arrests_bwmale, alternative = &quot;two.sided&quot;)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  age by race
+## t = -3.9976, df = 2219.3, p-value = 6.608e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -2.981918 -1.019167
+## sample estimates:
+## mean in group Black mean in group White 
+##            33.80732            35.80786</code></pre>
+<pre class="r"><code>ggplot(arrests, aes(x = arrest_time))+
+  geom_histogram(binwidth = 5)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(arrests, aes(x = street_number))+
+  geom_histogram(binwidth = 100)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+<pre class="r"><code>arrests %&gt;%
+  count(street_number)%&gt;%
+  arrange(-n)</code></pre>
+<pre><code>## # A tibble: 82 × 2
+##    street_number     n
+##            &lt;dbl&gt; &lt;int&gt;
+##  1          1500   444
+##  2          1600   327
+##  3          1700   248
+##  4          1900   229
+##  5          1100   207
+##  6          1800   183
+##  7           800   179
+##  8           900   172
+##  9           600   171
+## 10          1000   160
+## # … with 72 more rows</code></pre>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

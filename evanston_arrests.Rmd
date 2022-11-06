@@ -1,13 +1,24 @@
-# Evanston Police Dataset 
+---
+title: "Evanston Arrests"
+author: "Patrick Tu"
+date: "11/6/2022"
+output: 
+  html_document:
+    code_folding: hide
+---
 
-#* Assignment:
-#* 1) Learn the API and pull the evanston police dataset into R
-#* Police dataset link: https://data.cityofevanston.org/Police/Evanston-Arrests/25em-v4fn
-#* API docs: https://dev.socrata.com/foundry/data.cityofevanston.org/25em-v4fn
-#* RSocrata: https://github.com/Chicago/RSocrata
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = FALSE,
+  message = FALSE,
+  warning = FALSE)
+```
 
+For our next R analysis we decided to focus once again on the city of Evanston, Illinois. This time we are focusing on the demographics of arrests in Evanston using [this](https://data.cityofevanston.org/Police/Evanston-Arrests/25em-v4fn) data set from the City of Evanston database. We wanted to know what races, ages, and genders were the most likely to be arrested in Evanston. 
+
+```{r}
 library("RSocrata")
-library("RColorBrewer")
 library("tidyverse")
 
 arrests <- 
@@ -39,14 +50,11 @@ arrests <-
          arrest_time = as.numeric(arrest_time),
          street_number = as.numeric(street_number)) %>%
   filter(Year > 2016)
-  
+```  
 
-#Race and age
-#Race and gender
-#Arrests by day of week
-#Arrests by month
-#Arrests by year
+We were interested in how arrests have changed over the years and if arrests happen more on certain days of the week so we graphed those variables here
 
+```{r}
 ggplot(arrests, aes(x = day_of_the_week))+
   geom_bar()+
   facet_wrap(~Year)
@@ -60,7 +68,11 @@ arrests %>%
 ggplot(arrests, aes(x = Month))+
   geom_bar() +
   facet_wrap(~Year, nrow = 1)
+```
 
+
+
+```{r}
 chi_data_df <- 
   arrests %>% 
   count(Year, Month) %>%
@@ -76,12 +88,11 @@ rownames(chi_data_mat) <- chi_data_df$Month
 
 # chi-square test of independence
 chisq.test(chi_data_mat) # significant!
+```
 
-# Assignment
-# 1. Compute and plot the average age of the arrests across males and females
-# 2. Average age across races
-# 3. Average age across sex and race
+Next we decided to plot graphs comparing age, race, and gender of those arrested
 
+```{r}
 ggplot(arrests%>%
          filter(complete.cases(sex)), aes(x = age))+
   geom_histogram(binwidth = 2)+
@@ -102,9 +113,6 @@ arrests_gender <- arrests %>%
     )
 
 t.test(age~sex, data = arrests, alternative = "two.sided")
-
-ggplot(arrests_gender, aes(x = sex,y = gender_mean))+
-  geom_boxplot()
 
 arrests_race <- arrests %>%
   filter(complete.cases(race, age))%>%
@@ -137,19 +145,10 @@ ggplot(arrests_race, aes(x = race, y = race_mean))+
     caption = "Error bars are sd", 
     title = "Arrests in Evanston by Age and Race"
     )
-  
-#ASSIGNMENT:
-#1. MAKE GENDER MEAN AGE GRAPH
-#2. HISTOGRAM OF SEX+RACE WITH AGE AS MEASURING VARIABLE use facet_grid()
-#3. CALCULATE ALL THE SUMMARY STATISTICS FOR SEX+RACE AND AGE
-#4. REPLICATE THIS MEAN AGE PLOT WITH SEX+RACE
 
 arrests_race_gender <- arrests %>%
   group_by(sex, race) %>%
   summarise(racesex_mean = mean(age, na.rm = TRUE))
-
-ggplot(arrests_race_gender, aes(x = race, y = racesex_mean))+
-  geom_boxplot()
 
 ggplot(arrests_gender, aes(x = sex, y = gender_mean))+
   geom_point(
@@ -213,7 +212,9 @@ ggplot(arrests_racesex, aes(x = race, y = med))+
     title = "Arrests in Evanston by Race, Sex, and Age"
   )+
   facet_wrap(~sex)
+```
 
+```{r}
 arrests_bwmale <- arrests_final%>%
   filter(complete.cases(age))%>%
   filter(sex == "Male", race %in% c("White", "Black"))
@@ -229,42 +230,4 @@ ggplot(arrests, aes(x = street_number))+
 arrests %>%
   count(street_number)%>%
   arrange(-n)
-
-evanston_demo <- tibble(race = c("White", "Black", "Asian"), 
-                        n = c(50537, 12888, 7186), 
-                        percent = c(0.647, 0.165, 0.092))
-
-#ASSIGNMENT 10/23/22
-#1. Gather population data for Evanston (race, sex, race+sex)
-#Population: 78,110
-#White - 50,537 (64.7%), Black - 12,888 (16.5%), Asian - 7,186 (9.2%)
-#Female - 40,773 (52.2%), 36,337 (47.8%)
-#https://www.census.gov/quickfacts/fact/dashboard/evanstoncityillinois
-#2. Organize script into blog post
-
-arrests_race$n <- sum(arrests_race$race_sample)
-
-arrests_race$percent <- 
-  arrests_race$race_sample/arrests_race$sum_arrests
-
-#arrests_race %>%
-#  mutate(sum_arrests = sum(race_sample), 
-#         percent_arrests = race_sample/sum_arrests)
-
-arrests_percent <- rbind(arrests_race %>%
-        select(percent, race, n = race_sample), evanston_demo) %>%
-  mutate(observe = c(
-    "Arrest", 
-    "Arrest", "Arrest", "Arrest", "Population",
-    "Population", "Population"))
-
-ggplot(data = arrests_percent, aes(x = race, 
-                                   y = percent*100, 
-                                   group = observe, 
-                                   fill = observe))+
-  geom_bar(stat = "identity", position = position_dodge(), color = "Black")+
-  labs(x = "Race", y = "Percent", fill = "Data Type", title = "Arrests in Evanston by Race Compared to Census Data")+
-  theme_minimal()+
-  scale_fill_brewer(palette = "Paired")
-
-  
+```
