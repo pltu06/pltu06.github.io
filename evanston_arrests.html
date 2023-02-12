@@ -14,7 +14,7 @@
 
 <title>Evanston Arrests</title>
 
-<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/darkly.min.css" rel="stylesheet" />
@@ -143,11 +143,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -176,8 +180,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -185,16 +189,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -280,7 +277,13 @@ $(document).ready(function () {
 </div>
 
 
-<p>For our next R analysis we decided to focus once again on the city of Evanston, Illinois. This time we are focusing on the demographics of arrests in Evanston using <a href="https://data.cityofevanston.org/Police/Evanston-Arrests/25em-v4fn">this</a> data set from the City of Evanston database. We wanted to know what races, ages, and genders were the most likely to be arrested in Evanston.</p>
+<p>For our next R analysis we decided to focus once again on the city of
+Evanston, Illinois. This time we are focusing on the demographics of
+arrests in Evanston using <a
+href="https://data.cityofevanston.org/Police/Evanston-Arrests/25em-v4fn">this</a>
+data set from the City of Evanston database. We wanted to know what
+races, ages, and genders were the most likely to be arrested in
+Evanston.</p>
 <pre class="r"><code>library(&quot;RSocrata&quot;)
 library(&quot;tidyverse&quot;)
 
@@ -291,8 +294,7 @@ arrests &lt;-
   mutate(
       day_of_the_week = factor(day_of_the_week),
       day_of_the_week = fct_relevel(
-        day_of_the_week, 
-        values = c(
+        day_of_the_week, c(
           &quot;Mon&quot;, 
           &quot;Tue&quot;, 
           &quot;Wed&quot;, 
@@ -313,13 +315,21 @@ arrests &lt;-
          arrest_time = as.numeric(arrest_time),
          street_number = as.numeric(street_number)) %&gt;%
   filter(Year &gt; 2016)</code></pre>
-<p>We were interested in how arrests have changed over the years and if arrests happen more on certain days of the week so we graphed those variables here</p>
+<p>We were interested in how arrests have changed over the years and if
+arrests happen more on certain days of the week so we graphed those
+variables here</p>
 <pre class="r"><code>ggplot(arrests, aes(x = day_of_the_week))+
   geom_bar()+
-  facet_wrap(~Year)</code></pre>
+  facet_wrap(~Year)+
+  labs(
+    x = &quot;Day&quot;,
+    y = &quot;Arrests&quot;,
+    title = &quot;Arrests by Day of the Week&quot;
+  )</code></pre>
 <p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>ggplot(arrests, aes(x = Year))+
-  geom_bar()</code></pre>
+  geom_bar()+
+  labs(x = &quot;Year&quot;, y = &quot;Arrests&quot;, title = &quot;Arrests by Year&quot;)</code></pre>
 <p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
 <pre class="r"><code>arrests %&gt;%
   count(Year)</code></pre>
@@ -331,10 +341,23 @@ arrests &lt;-
 ## 3  2019  1233
 ## 4  2020   923
 ## 5  2021   646</code></pre>
-<pre class="r"><code>ggplot(arrests, aes(x = Month))+
+<pre class="r"><code>ggplot(arrests, aes(x = as.numeric(Month)))+
   geom_bar() +
-  facet_wrap(~Year, nrow = 1)</code></pre>
+  facet_wrap(~Year, nrow = 2)+
+  labs(x = &quot;Month&quot;, y = &quot;Arrests&quot;, title = &quot;Arrests by Month for 2017-2021&quot;)+
+  scale_x_continuous(breaks = seq(1,12,1), minor_breaks = NULL)</code></pre>
 <p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-3.png" width="672" /></p>
+<pre class="r"><code>ggplot(arrests, aes(x = as.numeric(Month)))+
+  geom_bar() +
+  labs(x = &quot;Month&quot;, y = &quot;Arrests&quot;, title = &quot;Arrests by Month&quot;)+
+  scale_x_continuous(breaks = seq(1,12,1), minor_breaks = NULL)</code></pre>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<p>After graphing this data we were able to see that while there were
+some outliers, more arrests came in the late spring and summer months.
+Certain years had a lot more arrests than others and arrests were
+particularly high in 2017 and 2019. We decided to perform a Chi-squared
+test to determine if there was a relationship between the month and
+arrests.</p>
 <pre class="r"><code>chi_data_df &lt;- 
   arrests %&gt;% 
   count(Year, Month) %&gt;%
@@ -355,13 +378,22 @@ chisq.test(chi_data_mat) # significant!</code></pre>
 ## 
 ## data:  chi_data_mat
 ## X-squared = 205.67, df = 44, p-value &lt; 2.2e-16</code></pre>
-<p>Next we decided to plot graphs comparing age, race, and gender of those arrested</p>
+<p>A significant Chi-squared test suggests that the amount of arrests
+depends on the month. Such that there are greater arrests in May and
+June, while December has fewer arrests on average.</p>
+<p>Next we decided to plot graphs comparing age, race, and gender of
+those arrested</p>
 <pre class="r"><code>ggplot(arrests%&gt;%
          filter(complete.cases(sex)), aes(x = age))+
   geom_histogram(binwidth = 2)+
   coord_cartesian(xlim = c(0,90))+
   scale_x_continuous(breaks = seq(0,90,10))+
-  facet_wrap(~sex)</code></pre>
+  facet_wrap(~sex)+
+  labs(
+    x = &quot;Age&quot;,
+    y = &quot;Arrests&quot;,
+    title = &quot;Arrests in Evanston by Age&quot;
+  )</code></pre>
 <p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>arrests_gender &lt;- arrests %&gt;%
   filter(complete.cases(sex, age)) %&gt;%
@@ -381,12 +413,16 @@ t.test(age~sex, data = arrests, alternative = &quot;two.sided&quot;)</code></pre
 ## 
 ## data:  age by sex
 ## t = 0.80853, df = 1383.8, p-value = 0.4189
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group Female and group Male is not equal to 0
 ## 95 percent confidence interval:
 ##  -0.572061  1.374255
 ## sample estimates:
 ## mean in group Female   mean in group Male 
 ##             34.89005             34.48895</code></pre>
+<p>We ran a t test to determine if the difference in ages between
+arrested males and females was statistically significant. The t test
+showed that it wasn’t statistically significant so we can assume that
+males and females are arrested at the same ages on average.</p>
 <pre class="r"><code>arrests_race &lt;- arrests %&gt;%
   filter(complete.cases(race, age))%&gt;%
   group_by(race) %&gt;%
@@ -418,7 +454,7 @@ ggplot(arrests_race, aes(x = race, y = race_mean))+
     caption = &quot;Error bars are sd&quot;, 
     title = &quot;Arrests in Evanston by Age and Race&quot;
     )</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <pre class="r"><code>arrests_race_gender &lt;- arrests %&gt;%
   group_by(sex, race) %&gt;%
   summarise(racesex_mean = mean(age, na.rm = TRUE))
@@ -442,7 +478,7 @@ ggplot(arrests_gender, aes(x = sex, y = gender_mean))+
     caption = &quot;Error bars are sd&quot;, 
     title = &quot;Arrests in Evanston by Age and Sex&quot;
   )</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
 <pre class="r"><code>arrests_final &lt;- arrests%&gt;%
   filter(complete.cases(race, sex))
 
@@ -450,8 +486,9 @@ ggplot(arrests_final, aes(x = age))+
   geom_histogram(binwidth = 2)+
   coord_cartesian(xlim = c(0,90))+
   scale_x_continuous(breaks = seq(0,90,10))+
+  labs(x = &quot;Age&quot;, y = &quot;Arrests&quot;)+
  facet_grid(race~sex)</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-4.png" width="672" /></p>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-3.png" width="672" /></p>
 <pre class="r"><code>arrests_racesex &lt;- arrests_final %&gt;%
   filter(complete.cases(age))%&gt;%
   group_by(race, sex) %&gt;%
@@ -485,7 +522,9 @@ ggplot(arrests_racesex, aes(x = race, y = med))+
     title = &quot;Arrests in Evanston by Race, Sex, and Age&quot;
   )+
   facet_wrap(~sex)</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-4-5.png" width="672" /></p>
+<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-4.png" width="672" /></p>
+<p>After graphing these variables we decided to see if the difference in
+ages between black and white arrests was statistically significant.</p>
 <pre class="r"><code>arrests_bwmale &lt;- arrests_final%&gt;%
   filter(complete.cases(age))%&gt;%
   filter(sex == &quot;Male&quot;, race %in% c(&quot;White&quot;, &quot;Black&quot;))
@@ -496,35 +535,22 @@ t.test(age~race, data = arrests_bwmale, alternative = &quot;two.sided&quot;)</co
 ## 
 ## data:  age by race
 ## t = -3.9976, df = 2219.3, p-value = 6.608e-05
-## alternative hypothesis: true difference in means is not equal to 0
+## alternative hypothesis: true difference in means between group Black and group White is not equal to 0
 ## 95 percent confidence interval:
 ##  -2.981918 -1.019167
 ## sample estimates:
 ## mean in group Black mean in group White 
 ##            33.80732            35.80786</code></pre>
-<pre class="r"><code>ggplot(arrests, aes(x = arrest_time))+
-  geom_histogram(binwidth = 5)</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(arrests, aes(x = street_number))+
-  geom_histogram(binwidth = 100)</code></pre>
-<p><img src="evanston_arrests_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
-<pre class="r"><code>arrests %&gt;%
-  count(street_number)%&gt;%
-  arrange(-n)</code></pre>
-<pre><code>## # A tibble: 82 × 2
-##    street_number     n
-##            &lt;dbl&gt; &lt;int&gt;
-##  1          1500   444
-##  2          1600   327
-##  3          1700   248
-##  4          1900   229
-##  5          1100   207
-##  6          1800   183
-##  7           800   179
-##  8           900   172
-##  9           600   171
-## 10          1000   160
-## # … with 72 more rows</code></pre>
+<p>We found that the difference in ages between black individuals and
+white individuals was statistically significant and black arrests were
+younger than white arrests</p>
+<p>This data showed that more black individuals were arrested in
+Evanston and they tended to be younger than white individuals arrested
+in Evanston. In general the average age for across all demographics was
+around 30-40 years old, but large amounts of arrests for age groups
+started around late teens and ended in the late 30s and early 40s. We
+think that it might me interesting to see in the future if there are
+certain areas that more arrests happen in.</p>
 
 
 

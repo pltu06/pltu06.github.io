@@ -28,3 +28,6 @@ Click below for the links to my individual blog posts
   <i class="fa-regular fa-map fa-2x"></i>
   <a href="https://pltu06.github.io/Evanston_restaurant.html" class="btn btn-primary" role="button">Evanston Restaurant Violations Map</a>  
   
+  <i class="fa-solid fa-tree-city fa-2x"></i>
+  <i class="fa-regular fa-chart-line fa-2x"></i>
+  <a href="https://pltu06.github.io/evanston_arrests.html" class="btn btn-primary" role="button">Evanston Arrests Data Analysis</a>  

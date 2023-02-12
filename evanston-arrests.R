@@ -18,7 +18,7 @@ arrests <-
       day_of_the_week = factor(day_of_the_week),
       day_of_the_week = fct_relevel(
         day_of_the_week, 
-        values = c(
+        c(
           "Mon", 
           "Tue", 
           "Wed", 

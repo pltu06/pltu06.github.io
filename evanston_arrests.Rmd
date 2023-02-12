@@ -28,8 +28,7 @@ arrests <-
   mutate(
       day_of_the_week = factor(day_of_the_week),
       day_of_the_week = fct_relevel(
-        day_of_the_week, 
-        values = c(
+        day_of_the_week, c(
           "Mon", 
           "Tue", 
           "Wed", 
@@ -57,20 +56,34 @@ We were interested in how arrests have changed over the years and if arrests hap
 ```{r}
 ggplot(arrests, aes(x = day_of_the_week))+
   geom_bar()+
-  facet_wrap(~Year)
+  facet_wrap(~Year)+
+  labs(
+    x = "Day",
+    y = "Arrests",
+    title = "Arrests by Day of the Week"
+  )
 
 ggplot(arrests, aes(x = Year))+
-  geom_bar()
+  geom_bar()+
+  labs(x = "Year", y = "Arrests", title = "Arrests by Year")
 
 arrests %>%
   count(Year)
 
-ggplot(arrests, aes(x = Month))+
+ggplot(arrests, aes(x = as.numeric(Month)))+
   geom_bar() +
-  facet_wrap(~Year, nrow = 1)
+  facet_wrap(~Year, nrow = 2)+
+  labs(x = "Month", y = "Arrests", title = "Arrests by Month for 2017-2021")+
+  scale_x_continuous(breaks = seq(1,12,1), minor_breaks = NULL)
+
+
+ggplot(arrests, aes(x = as.numeric(Month)))+
+  geom_bar() +
+  labs(x = "Month", y = "Arrests", title = "Arrests by Month")+
+  scale_x_continuous(breaks = seq(1,12,1), minor_breaks = NULL)
 ```
 
-
+After graphing this data we were able to see that while there were some outliers, more arrests came in the late spring and summer months. Certain years had a lot more arrests than others and arrests were particularly high in 2017 and 2019. We decided to perform a Chi-squared test to determine if there was a relationship between the month and arrests.
 
 ```{r}
 chi_data_df <- 
@@ -90,6 +103,8 @@ rownames(chi_data_mat) <- chi_data_df$Month
 chisq.test(chi_data_mat) # significant!
 ```
 
+A significant Chi-squared test suggests that the amount of arrests depends on the month. Such that there are greater arrests in May and June, while December has fewer arrests on average.
+
 Next we decided to plot graphs comparing age, race, and gender of those arrested
 
 ```{r}
@@ -98,7 +113,12 @@ ggplot(arrests%>%
   geom_histogram(binwidth = 2)+
   coord_cartesian(xlim = c(0,90))+
   scale_x_continuous(breaks = seq(0,90,10))+
-  facet_wrap(~sex)
+  facet_wrap(~sex)+
+  labs(
+    x = "Age",
+    y = "Arrests",
+    title = "Arrests in Evanston by Age"
+  )
 
 arrests_gender <- arrests %>%
   filter(complete.cases(sex, age)) %>%
@@ -113,7 +133,11 @@ arrests_gender <- arrests %>%
     )
 
 t.test(age~sex, data = arrests, alternative = "two.sided")
+```
 
+We ran a t test to determine if the difference in ages between arrested males and females was statistically significant. The t test showed that it wasn't statistically significant so we can assume that males and females are arrested at the same ages on average.
+
+```{r}
 arrests_race <- arrests %>%
   filter(complete.cases(race, age))%>%
   group_by(race) %>%
@@ -177,6 +201,7 @@ ggplot(arrests_final, aes(x = age))+
   geom_histogram(binwidth = 2)+
   coord_cartesian(xlim = c(0,90))+
   scale_x_continuous(breaks = seq(0,90,10))+
+  labs(x = "Age", y = "Arrests")+
  facet_grid(race~sex)
   
 arrests_racesex <- arrests_final %>%
@@ -214,20 +239,16 @@ ggplot(arrests_racesex, aes(x = race, y = med))+
   facet_wrap(~sex)
 ```
 
+After graphing these variables we decided to see if the difference in ages between black and white arrests was statistically significant.
+
 ```{r}
 arrests_bwmale <- arrests_final%>%
   filter(complete.cases(age))%>%
   filter(sex == "Male", race %in% c("White", "Black"))
 
 t.test(age~race, data = arrests_bwmale, alternative = "two.sided")
-
-ggplot(arrests, aes(x = arrest_time))+
-  geom_histogram(binwidth = 5)
-
-ggplot(arrests, aes(x = street_number))+
-  geom_histogram(binwidth = 100)
-
-arrests %>%
-  count(street_number)%>%
-  arrange(-n)
 ```
+
+We found that the difference in ages between black individuals and white individuals was statistically significant and black arrests were younger than white arrests
+
+This data showed that more black individuals were arrested in Evanston and they tended to be younger than white individuals arrested in Evanston. In general the average age for across all demographics was around 30-40 years old, but large amounts of arrests for age groups started around late teens and ended in the late 30s and early 40s. We think that it might me interesting to see in the future if there are certain areas that more arrests happen in.
