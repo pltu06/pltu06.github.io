@@ -58,16 +58,35 @@ bootres <- 1:2000%>%
 bootres_df <- bootres%>%
   map_dfr(~as_tibble(.x), .id = "ITER")
 
-ggplot(bootres[[1]], aes())
-
 ggplot(bootres_df %>%
          filter(ITER == "1"), aes(x = value))+
   geom_density()
 
-
 ggplot(bootres_df, aes(x = value, group  = ITER))+
   geom_density()
-  
+
+bootres_df2 <- bootres_df%>%
+  mutate(ITER = as.numeric(ITER))
+
+bootres_stats <- bootres_df2%>%
+  group_by(ITER)%>%  
+  summarise(mean_age  = mean(value), 
+    sd_age = sd(value), 
+    n = n(), 
+    median_age = median(value),
+    margin = qt(0.975,df=n-1)*sd_age/sqrt(n),
+    ll = mean_age - margin,
+    ul = mean_age + margin)
+
+ggplot(bootres_stats, aes(x = ITER, y = mean_age))+
+  geom_point()
+         
+bootres_sd <- bootres_df2%>%
+  select(value)
+  summarise(mean_age  = mean(value), 
+            margin = qt(0.975,df=n-1)*sd_age/sqrt(n),
+            ll = mean_age - margin,
+            ul = mean_age + margin)
 
 # Assignment 12 FEB 2023 ----
 # 1 calculate the mean, sd, median for each iteration
