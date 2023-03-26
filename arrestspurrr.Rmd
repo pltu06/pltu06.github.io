@@ -1,7 +1,21 @@
+---
+title: "Using Bootstrapping to Resample Arrests"
+author: "Patrick Tu"
+date: "2023-03-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
 library("RSocrata")
 library("RColorBrewer")
 library("tidyverse")
+```
 
+```{r}
 arrests <- 
   as_tibble(
     read.socrata("https://data.cityofevanston.org/resource/25em-v4fn.json")
@@ -31,7 +45,9 @@ arrests <-
          arrest_time = as.numeric(arrest_time),
          street_number = as.numeric(street_number)) %>%
   filter(Year > 2016)
+```
 
+```{r}
 arrests_stats <- arrests%>%
   filter(!is.na(age))%>%
   summarise(
@@ -90,26 +106,20 @@ ggplot(bootres_stats, aes(x = mean_age))+
   geom_histogram()+
   geom_vline(xintercept = bootres_sd[1])+
   geom_vline(xintercept  = bootres_sd[2])
+```
+
+```{r}
 arrests_whi <- arrests %>%
-  filter(race == "Black")
-
-arrests_whi <- arrests%>%
   filter(race == "White")
-
-arrests_ci_whi <- arrests%>%
-  filter(is.na(age))
-
-bootres_df_whi <- bootres_whi%>%
-  map_dfr(~as_tibble(.x), .id = "ITER")
-
-bootres_df2_whi <- bootres_df_whi%>%
-  mutate(ITER = as.numeric(ITER))
 
 arrests_ci_whi <- arrests_whi%>%
   filter(!is.na(age))
 
 bootres_whi <- 1:2000%>%
   map(~sample(x = arrests_ci_whi$age, replace = TRUE))
+
+bootres_df_whi <- bootres_whi%>%
+  map_dfr(~as_tibble(.x), .id = "ITER")
 
 bootres_df2_whi <- bootres_df_whi%>%
   mutate(ITER = as.numeric(ITER))
@@ -123,6 +133,15 @@ bootres_stats_whi <- bootres_df2_whi%>%
             margin = qt(0.975,df=n-1)*sd_age/sqrt(n),
             ll = mean_age - margin,
             ul = mean_age + margin)
+
+arrests_bla <- arrests %>%
+  filter(race == "Black")
+
+arrests_ci_bla <- arrests_bla%>%
+  filter(!is.na(age))
+
+bootres_bla <- 1:2000%>%
+  map(~sample(x = arrests_ci_bla$age, replace = TRUE))
 
 bootres_df_bla <- bootres_bla%>%
   map_dfr(~as_tibble(.x), .id = "ITER")
@@ -154,12 +173,11 @@ ggplot(bootres_stats_bw, aes(x = mean_age, group = Race, color = Race))+
 ggplot(bootres_sd_bw, aes(x = Race, y = ave_age))+
   geom_point()+
   geom_errorbar(aes(ymin = mean_ll, ymax = mean_hl), width = .1)
+```
 
-#THIS PROCEDURE TOOK 70 LINES OF CODE
-#Assignment 2/26/23
-#see how many lines you can reduce this to
-#Convert into a blog post
+This procedure to find and graph the means for each iteration of the arrests data set worked, but it takes around seventy lines of code to complete. We tried to cut this down to around twenty lines which did below here.
 
+```{r}
 race_age_data  <- 
   arrests %>% 
   select(race, age) %>%
@@ -185,14 +203,4 @@ conf_int_res <-
     mean_ll = quantile(age, probs = 0.025), 
     mean_hl= quantile(age, probs = 0.975)
     )
-
-# Assignment for 05 March 2023
-# now that we've code efficient, let's write a blog post 
-# be sure to comment the code throughout
-# create a nice figure at the end to demonstrate the variability in
-# iterations
-
-# Look for another dataset that has a binary outcome
-# 0 = regular email; control
-# 1 = spam; patient
-
+```
