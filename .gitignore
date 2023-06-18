@@ -40,3 +40,6 @@ vignettes/*.pdf
 
 # R Project Variables
 *.Rproj
+
+# Files to be Ignored
+geocode.R
